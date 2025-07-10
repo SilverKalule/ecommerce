@@ -15,10 +15,22 @@ datasource db {
 }
 
 model Category {
-   id String @id @default(cuid())
-  image String
-  name String
-  slug String
-  date DateTime
-  createdAt DateTime @default(now())
+  id        String    @id @default(cuid())
+  image     String
+  name      String
+  slug      String
+  date      DateTime
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Product {
+  id         String   @id @default(cuid())
+  image      String
+  name       String
+  slug       String
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  price      Int
+  createdAt  DateTime @default(now())
 }

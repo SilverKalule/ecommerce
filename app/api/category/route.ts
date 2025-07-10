@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
         data: createCategory,
         error: null,
         message: "Category activity created successfully",
-        status: 201,
       },
       {
         status: 201,

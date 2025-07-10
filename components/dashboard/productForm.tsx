@@ -1,15 +1,24 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Cat } from "./product";
+import FormSelectInput from "../Inputs/FormSelectInput";
+import { createProduct } from "@/actions/category";
 export type ProductProps = {
-  id: string;
   name: string;
+  slug: string;
   image: string;
   price: number;
   categoryId: string;
 };
 
-export default function ProductForm({ onSuccess }: { onSuccess: () => void }) {
+export default function ProductForm({
+  onSuccess,
+  categories,
+}: {
+  onSuccess: () => void;
+  categories: Cat[];
+}) {
   const {
     register,
     handleSubmit,
@@ -17,18 +26,35 @@ export default function ProductForm({ onSuccess }: { onSuccess: () => void }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      id: "",
       name: "",
       image: "",
+      slug: "",
       price: 0,
       categoryId: "",
     },
   });
-
-  function saveData(data: ProductProps) {
-    console.log(data);
-    reset();
-    onSuccess();
+  const categoryOptions = categories.map((item) => {
+    return {
+      label: item.name,
+      value: item.id,
+    };
+  });
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  async function saveData(data: ProductProps) {
+    data.categoryId = selectedCategory.value;
+    data.price = Number(data.price);
+    const slug = data.name.trim().toLowerCase().split(" ").join("-");
+    data.slug = slug;
+    try {
+      setLoading(true);
+      const res = await createProduct(data);
+      console.log(res);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
   }
   return (
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
@@ -67,19 +93,14 @@ export default function ProductForm({ onSuccess }: { onSuccess: () => void }) {
             required
           />
         </div>
-        <div className="mb-5">
-          <label
-            htmlFor="password"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Category
-          </label>
-          <input
-            {...register("categoryId", { required: true })}
-            type="text"
-            id="categoryId"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
+        <div className="">
+          <FormSelectInput
+            label="Main Categories"
+            options={categoryOptions}
+            option={selectedCategory}
+            setOption={setSelectedCategory}
+            toolTipText="Add New  Category"
+            href="/dashboard/categories"
           />
         </div>
         <div className="mb-5">
@@ -101,7 +122,7 @@ export default function ProductForm({ onSuccess }: { onSuccess: () => void }) {
           type="submit"
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer"
         >
-          Submit
+          {loading ? "Loading..." : "Submit"}
         </button>
       </form>
     </div>

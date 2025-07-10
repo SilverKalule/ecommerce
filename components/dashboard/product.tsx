@@ -426,9 +426,12 @@ const ListProductCard: React.FC<{
     </div>
   );
 };
-
+export type Cat = {
+  id: string;
+  name: string;
+};
 // Main component
-const ProductThree = () => {
+const ProductThree = ({ data }: { data: Cat[] }) => {
   const [products, setProducts] = useState<Product[]>(sampleProducts);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
@@ -494,7 +497,10 @@ const ProductThree = () => {
           <BackgroundOverlay />
           {/* Centered Form */}
           <div>
-            <ProductForm onSuccess={() => setProductFormVisible(false)} />
+            <ProductForm
+              onSuccess={() => setProductFormVisible(false)}
+              categories={data}
+            />
           </div>
         </div>
       )}

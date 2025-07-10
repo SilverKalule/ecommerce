@@ -1,10 +1,12 @@
+import { getCategories } from "@/actions/category";
 import ProductThree from "@/components/dashboard/product";
 import React from "react";
 
-export default function Products() {
+export default async function Products() {
+  const categories = (await getCategories()) || [];
   return (
     <div>
-      <ProductThree />
+      <ProductThree data={categories} />
     </div>
   );
 }
